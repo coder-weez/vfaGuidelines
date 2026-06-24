@@ -6,11 +6,6 @@
     "description": "Provides organization documentation standards inline on EMSCharts fields.",
     "manifest_version": 3,
     "minimum_chrome_version": "88",
-    "icons": {
-        "16": "icon_16.png",
-        "48": "icon_48.png",
-        "128": "icon_128.png"
-    },
     "permissions": [
         "storage"
     ],
@@ -38,11 +33,6 @@
     ],
     "action": {
         "default_title": "VFA Documentation Standards",
-        "default_popup": "popup.html",
-        "default_icon": {
-            "16": "icon_16.png",
-            "48": "icon_48.png",
-            "128": "icon_128.png"
-        }
+        "default_popup": "popup.html"
     }
 }
