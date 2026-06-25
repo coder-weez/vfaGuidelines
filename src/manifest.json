@@ -6,6 +6,11 @@
     "description": "Provides organization documentation standards inline on EMSCharts fields.",
     "manifest_version": 3,
     "minimum_chrome_version": "88",
+    "icons": {
+        "16": "icon_16.png",
+        "48": "icon_48.png",
+        "128": "icon_128.png"
+    },
     "permissions": [
         "storage"
     ],
@@ -15,11 +20,14 @@
     "content_scripts": [
         {
             "matches": [
+                "https://*.emscharts.com/pr/page1.cfm*",
                 "https://*.emscharts.com/pr/page2.cfm*",
                 "https://*.emscharts.com/pr/page3.cfm*",
                 "https://*.emscharts.com/pr/page4.cfm*",
                 "https://*.emscharts.com/pr/page5.cfm*",
-                "https://*.emscharts.com/pr/page8.cfm*"
+                "https://*.emscharts.com/pr/page7.cfm*",
+                "https://*.emscharts.com/pr/page8.cfm*",
+                "https://*.emscharts.com/pr/page9.cfm*"
             ],
             "js": [
                 "docs.js",
@@ -31,8 +39,19 @@
             ]
         }
     ],
+    "web_accessible_resources": [
+        {
+            "resources": ["VFADocumentationStandards.pdf"],
+            "matches": ["<all_urls>"]
+        }
+    ],
     "action": {
         "default_title": "VFA Documentation Standards",
-        "default_popup": "popup.html"
+        "default_popup": "popup.html",
+        "default_icon": {
+            "16": "icon_16.png",
+            "48": "icon_48.png",
+            "128": "icon_128.png"
+        }
     }
 }

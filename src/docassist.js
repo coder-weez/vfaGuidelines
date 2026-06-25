@@ -51,10 +51,12 @@
 
     // ── Icon injection ───────────────────────────────────────────────────
 
-    function injectIcon(el, docText) {
+    function injectIcon(el, docText, before, inside) {
         // Don't add a second icon if already injected
         if (el.dataset.vfaDoc) return;
         el.dataset.vfaDoc = '1';
+
+        var fieldId = el.name || el.className;
 
         var icon = document.createElement('span');
         icon.className = ICON_CLASS;
@@ -64,15 +66,28 @@
             e.stopPropagation();
             var tip = document.getElementById(TOOLTIP_ID);
             var isVisible = tip && tip.classList.contains('vfa-doc-tooltip-visible');
-            var isSame = tip && tip.dataset.fieldName === el.name;
+            var isSame = tip && tip.dataset.fieldName === fieldId;
             hideTooltip();
             if (!isVisible || !isSame) {
-                getTooltip().dataset.fieldName = el.name;
+                getTooltip().dataset.fieldName = fieldId;
                 showTooltip(icon, docText);
             }
         });
 
-        el.parentNode.insertBefore(icon, el.nextSibling);
+        if (inside) {
+            el.appendChild(icon);
+        } else if (el.tagName === 'TEXTAREA') {
+            // Wrap textarea so the icon can be absolutely positioned at the top right
+            var wrapper = document.createElement('span');
+            wrapper.className = 'vfa-textarea-wrapper';
+            el.parentNode.insertBefore(wrapper, el);
+            wrapper.appendChild(el);
+            wrapper.appendChild(icon);
+        } else if (before) {
+            el.parentNode.insertBefore(icon, el);
+        } else {
+            el.parentNode.insertBefore(icon, el.nextSibling);
+        }
     }
 
     // ── Field scan ───────────────────────────────────────────────────────
@@ -81,9 +96,66 @@
         Object.keys(VFA_DOCS).forEach(function(fieldName) {
             var els = document.querySelectorAll('[name="' + fieldName + '"]');
             els.forEach(function(el) {
-                injectIcon(el, VFA_DOCS[fieldName]);
+                injectIcon(el, VFA_DOCS[fieldName], false);
             });
         });
+        Object.keys(VFA_DOCS_SELECTOR).forEach(function(selector) {
+            var entry = VFA_DOCS_SELECTOR[selector];
+            var text = typeof entry === 'object' ? entry.text : entry;
+            var before = typeof entry === 'object' ? entry.before : false;
+            var inside = typeof entry === 'object' ? entry.inside : false;
+
+            // Support "selector|Match Text" to filter by trimmed inner text
+            var parts = selector.split('|');
+            var cssSelector = parts[0];
+            var matchText = parts[1] ? parts[1].trim() : null;
+
+            var els = document.querySelectorAll(cssSelector);
+            els.forEach(function(el) {
+                if (matchText && el.textContent.trim() !== matchText) return;
+                injectIcon(el, text, before, inside);
+            });
+        });
+    }
+
+    // ── Documentation toolbar ────────────────────────────────────────────
+
+    var PAGE_PDF_MAP = {
+        'page1': 4,
+        'page2': 6,
+        'page3': 7,
+        'page4': 9,
+        'page5': 10,
+        'page7': 13,
+        'page8': 14,
+        'page9': 15
+    };
+
+    function getDocPage() {
+        var match = window.location.pathname.match(/page(\d+)\.cfm/i);
+        if (!match) return 1;
+        return PAGE_PDF_MAP['page' + match[1]] || 1;
+    }
+
+    function createDocToolbar() {
+        if (document.getElementById('vfa-doc-toolbar')) return;
+
+        var pageMatch = window.location.pathname.match(/page(\d+)\.cfm/i);
+        var pageNum = pageMatch ? pageMatch[1] : '';
+
+        var toolbar = document.createElement('div');
+        toolbar.id = 'vfa-doc-toolbar';
+
+        var btn = document.createElement('button');
+        btn.id = 'vfa-doc-toolbar-btn';
+        btn.innerHTML = 'Page ' + pageNum + '<br>Doc Standards';
+        btn.addEventListener('click', function() {
+            var pdfUrl = chrome.runtime.getURL('VFADocumentationStandards.pdf') + '#page=' + getDocPage();
+            window.open(pdfUrl, '_blank');
+        });
+
+        toolbar.appendChild(btn);
+        document.body.appendChild(toolbar);
     }
 
     // ── Init ─────────────────────────────────────────────────────────────
@@ -91,9 +163,10 @@
     // after a short delay to catch late-rendered fields.
 
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', scanFields);
+        document.addEventListener('DOMContentLoaded', function() { scanFields(); createDocToolbar(); });
     } else {
         scanFields();
+        createDocToolbar();
     }
     setTimeout(scanFields, 1500);
 

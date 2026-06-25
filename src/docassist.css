@@ -1,5 +1,45 @@
 /* VFA Documentation Standards — injected styles */
 
+#vfa-doc-toolbar {
+    position: fixed;
+    top: 75vh;
+    right: 8px;
+    z-index: 2147483646;
+    display: flex;
+    padding: 5px;
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid #bbb;
+    border-radius: 6px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+    align-items: center;
+}
+
+#vfa-doc-toolbar-btn {
+    padding: 4px 12px;
+    background: #0d9488;
+    color: #fff;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+    font-weight: bold;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    line-height: 1.4;
+    text-align: center;
+    width: 135px;
+    min-height: 55px;
+    opacity: 0.85;
+}
+
+#vfa-doc-toolbar-btn:hover {
+    background: #0f766e;
+    opacity: 1;
+}
+
+#vfa-doc-toolbar-btn:active {
+    background: #115e59;
+}
+
 .vfa-doc-icon {
     display: inline-block;
     width: 14px;
@@ -25,6 +65,17 @@
 
 .vfa-doc-icon:hover {
     background: #0f766e;
+}
+
+.vfa-textarea-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.vfa-textarea-wrapper .vfa-doc-icon {
+    position: absolute;
+    top: 2px;
+    right: -18px;
 }
 
 #vfa-doc-tooltip {
