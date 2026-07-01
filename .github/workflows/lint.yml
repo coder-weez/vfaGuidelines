@@ -25,9 +25,14 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      # Catches real bugs in the vanilla-DOM code (undeclared globals, unused
+      # vars, typos in field-name maps).
+      - name: Lint JavaScript (ESLint)
+        run: npm run lint
+
       # Validates the manifest and flags structural issues in src/.
       # web-ext is Firefox tooling; Chrome-only manifest keys surface as
       # warnings (non-fatal) while real errors (bad manifest, missing files)
       # fail the job.
-      - name: Lint extension
-        run: npm run lint
+      - name: Lint extension (web-ext)
+        run: npm run lint:ext

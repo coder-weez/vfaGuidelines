@@ -4,9 +4,13 @@
   "private": true,
   "description": "Chrome MV3 extension that injects documentation-standard tooltips onto EMSCharts PCR fields.",
   "scripts": {
-    "lint": "web-ext lint --source-dir=src"
+    "lint": "eslint .",
+    "lint:ext": "web-ext lint --source-dir=src"
   },
   "devDependencies": {
+    "@eslint/js": "^9.0.0",
+    "eslint": "^9.0.0",
+    "globals": "^15.0.0",
     "web-ext": "^8.0.0"
   }
 }
