@@ -5,6 +5,14 @@
     "description": "Provides organization documentation standards inline on EMSCharts fields.",
     "manifest_version": 3,
     "minimum_chrome_version": "88",
+    "browser_specific_settings": {
+        "gecko": {
+            "id": "vfa-documentation-standards@coder-weez.github.io",
+            "data_collection_permissions": {
+                "required": ["none"]
+            }
+        }
+    },
     "icons": {
         "16": "icon_16.png",
         "48": "icon_48.png",
