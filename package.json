@@ -1,0 +1,12 @@
+{
+  "name": "vfa-documentation-standards",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Chrome MV3 extension that injects documentation-standard tooltips onto EMSCharts PCR fields.",
+  "scripts": {
+    "lint": "web-ext lint --source-dir=src"
+  },
+  "devDependencies": {
+    "web-ext": "^8.0.0"
+  }
+}

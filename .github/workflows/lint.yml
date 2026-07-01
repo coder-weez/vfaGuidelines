@@ -1,0 +1,33 @@
+name: Lint
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  web-ext-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # No lockfile is committed, so use `npm install` rather than `npm ci`.
+      - name: Install dependencies
+        run: npm install
+
+      # Validates the manifest and flags structural issues in src/.
+      # web-ext is Firefox tooling; Chrome-only manifest keys surface as
+      # warnings (non-fatal) while real errors (bad manifest, missing files)
+      # fail the job.
+      - name: Lint extension
+        run: npm run lint
