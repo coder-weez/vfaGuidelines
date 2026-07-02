@@ -7,6 +7,13 @@
     var ICON_CLASS = 'vfa-doc-icon';
     var TOOLTIP_ID = 'vfa-doc-tooltip';
 
+    // Feature flag: the on-page field ⓘ icons and their documentation tooltips
+    // (the "popup information elements") are temporarily disabled so the
+    // extension only shows the "Doc Standards" toolbar button. All of the
+    // supporting code below is intentionally retained — flip this back to
+    // true to reinstate the field popups.
+    var SHOW_FIELD_POPUPS = false;
+
     // ── Tooltip ──────────────────────────────────────────────────────────
 
     function getTooltip() {
@@ -148,7 +155,9 @@
 
         var btn = document.createElement('button');
         btn.id = 'vfa-doc-toolbar-btn';
-        btn.innerHTML = 'Page ' + pageNum + '<br>Doc Standards';
+        btn.appendChild(document.createTextNode('Page ' + pageNum));
+        btn.appendChild(document.createElement('br'));
+        btn.appendChild(document.createTextNode('Doc Standards'));
         btn.addEventListener('click', function() {
             var pdfUrl = chrome.runtime.getURL('VFADocumentationStandards.pdf') + '#page=' + getDocPage();
             window.open(pdfUrl, '_blank');
@@ -163,11 +172,14 @@
     // after a short delay to catch late-rendered fields.
 
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', function() { scanFields(); createDocToolbar(); });
+        document.addEventListener('DOMContentLoaded', function() {
+            if (SHOW_FIELD_POPUPS) { scanFields(); }
+            createDocToolbar();
+        });
     } else {
-        scanFields();
+        if (SHOW_FIELD_POPUPS) { scanFields(); }
         createDocToolbar();
     }
-    setTimeout(scanFields, 1500);
+    if (SHOW_FIELD_POPUPS) { setTimeout(scanFields, 1500); }
 
 })();

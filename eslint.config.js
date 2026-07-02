@@ -4,11 +4,11 @@ const globals = require('globals');
 module.exports = [
   js.configs.recommended,
 
-  // Extension source: vanilla-DOM content scripts and popup, loaded as plain
-  // <script>s (no modules). docs.js and docassist.js share globals at runtime
-  // because the manifest concatenates them into the same page context.
+  // Content scripts (plain <script> context, access to DOM + VFA_DOCS globals).
+  // docs.js and docassist.js share globals at runtime because the manifest
+  // loads them in the same page context.
   {
-    files: ['src/**/*.js'],
+    files: ['src/docs.js', 'src/docassist.js'],
     languageOptions: {
       ecmaVersion: 2021,
       sourceType: 'script',
@@ -24,6 +24,19 @@ module.exports = [
       // Don't flag the shared VFA_* globals as unused/redeclared across files.
       'no-unused-vars': ['warn', { varsIgnorePattern: '^VFA_' }],
       'no-redeclare': ['error', { builtinGlobals: false }],
+    },
+  },
+
+  // Background service worker (no DOM; runs in a ServiceWorkerGlobalScope).
+  {
+    files: ['src/background.js'],
+    languageOptions: {
+      ecmaVersion: 2021,
+      sourceType: 'script',
+      globals: {
+        ...globals.serviceworker,
+        chrome: 'readonly',
+      },
     },
   },
 

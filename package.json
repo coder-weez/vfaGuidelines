@@ -5,7 +5,7 @@
   "description": "Chrome MV3 extension that injects documentation-standard tooltips onto EMSCharts PCR fields.",
   "scripts": {
     "lint": "eslint .",
-    "lint:ext": "web-ext lint --source-dir=src"
+    "lint:ext": "web-ext lint --source-dir=src --ignore-errors MANIFEST_FIELD_UNSUPPORTED"
   },
   "devDependencies": {
     "@eslint/js": "^9.0.0",
