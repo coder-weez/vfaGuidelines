@@ -1,0 +1,47 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    steps:
+      # Opens/updates a Release PR from Conventional Commit history. When that PR
+      # is merged, creates the vX.Y.Z tag + GitHub Release and sets the outputs
+      # consumed below.
+      - name: Run release-please
+        id: release
+        uses: googleapis/release-please-action@v4
+        with:
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+
+      # Everything below only runs on the push that actually cut a release.
+      - name: Checkout
+        if: ${{ steps.release.outputs.release_created }}
+        uses: actions/checkout@v4
+
+      - name: Package extension
+        if: ${{ steps.release.outputs.release_created }}
+        run: |
+          cd src
+          # Zip the CONTENTS of src/ so manifest.json sits at the archive root
+          # (required for Chrome Web Store uploads). Exclude OS cruft only.
+          zip -r "../vfa-docs-${{ steps.release.outputs.tag_name }}.zip" . \
+            -x "*.DS_Store" -x "__MACOSX/*"
+
+      - name: Upload package to release
+        if: ${{ steps.release.outputs.release_created }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload "${{ steps.release.outputs.tag_name }}" \
+            "vfa-docs-${{ steps.release.outputs.tag_name }}.zip" \
+            --clobber

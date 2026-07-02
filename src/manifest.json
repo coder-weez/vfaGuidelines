@@ -1,11 +1,18 @@
 {
     "name": "VFA Documentation Standards",
     "short_name": "VFA Docs",
-    "version": "0.1.0.0",
-    "version_name": "0.1.0 (Manifest V3)",
+    "version": "0.1.0",
     "description": "Provides organization documentation standards inline on EMSCharts fields.",
     "manifest_version": 3,
     "minimum_chrome_version": "88",
+    "browser_specific_settings": {
+        "gecko": {
+            "id": "vfa-documentation-standards@coder-weez.github.io",
+            "data_collection_permissions": {
+                "required": ["none"]
+            }
+        }
+    },
     "icons": {
         "16": "icon_16.png",
         "48": "icon_48.png",

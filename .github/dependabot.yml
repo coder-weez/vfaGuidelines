@@ -1,0 +1,21 @@
+version: 2
+updates:
+  # Keep the action versions used in .github/workflows/ up to date.
+  # This is the only dependency ecosystem present today — the extension itself
+  # ships zero third-party runtime libraries (plain DOM APIs only).
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      # Conventional-Commit prefix so these PRs don't spuriously cut a release.
+      prefix: "chore"
+
+  # Dev-only tooling (web-ext lint). These packages never ship in the
+  # extension — they run in CI to validate the manifest and source.
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore"
