@@ -2,17 +2,19 @@
 
 ## What this project is
 
-A Chrome MV3 extension that injects a small **ⓘ icon** next to EMSCharts PCR fields. Clicking the icon shows a tooltip with the organization's documentation standard for that field. It runs independently of EMSCharts Assist — no shared state, no messaging between the two.
+A Chrome MV3 extension that injects a small **ⓘ icon** next to EMSCharts PCR fields. Clicking the icon shows a tooltip with the organization's documentation standard for that field. It also adds a floating **Doc Standards** button that opens the standards PDF at the page-relevant section. It runs independently of EMSCharts Assist — no shared state, no messaging between the two.
+
+**Current mode (button-only):** the field icons and tooltips are gated behind the `SHOW_FIELD_POPUPS` flag in `docassist.js`, currently `false`, so only the Doc Standards button is shown. The icon/tooltip code is fully retained (and still referenced, to stay lint-clean) so it can be reinstated by setting the flag back to `true`. The browser-action popup (`popup.html`) is likewise disabled — `action.default_popup` was removed from the manifest — but the file is kept for reinstatement.
 
 ## Architecture
 
 ```
 src/
-  manifest.json    — MV3 manifest; declares content scripts and popup
+  manifest.json    — MV3 manifest; declares the content scripts and toolbar action
   docs.js          — Field definitions: maps EMSCharts field names to doc-standard text
-  docassist.js     — Content script; injects icons and manages the tooltip
-  docassist.css    — Styles for the injected icons and tooltip
-  popup.html       — Extension popup (static instructions, no JS)
+  docassist.js     — Content script; Doc Standards button, icon injection, tooltip
+  docassist.css    — Styles for the button, injected icons, and tooltip
+  popup.html       — Extension popup (static instructions, no JS); not currently wired up
 ```
 
 `docs.js` is loaded before `docassist.js` (declared first in the manifest `"js"` array), so `VFA_DOCS` is available as a global when `docassist.js` runs.
@@ -61,6 +63,19 @@ Plain string values are also accepted (treated as `before: false`).
 - On click: toggles the shared tooltip. Clicking the same icon twice hides it; clicking elsewhere on the page also hides it.
 
 **Double-scan pattern:** `scanFields` runs on `DOMContentLoaded` and again after 1500 ms. This catches fields EMSCharts renders dynamically after the initial DOM is ready. Do not remove the `setTimeout` call — it exists to handle late-rendered fields.
+
+**Feature flag:** all three `scanFields()` calls are wrapped in `if (SHOW_FIELD_POPUPS)`. While the flag is `false`, no icons or tooltips are injected. Keep `scanFields` referenced by these guards (rather than commenting the calls out) so ESLint `no-unused-vars` stays green.
+
+## Documentation toolbar button (`docassist.js`)
+
+`createDocToolbar()` appends a fixed-position `<div id="vfa-doc-toolbar">` with a single button labelled "Page N / Doc Standards". Clicking it opens the bundled `VFADocumentationStandards.pdf` at the page mapped in `PAGE_PDF_MAP` (EMSCharts page → PDF page), via `chrome.runtime.getURL(...) + '#page='`. This runs unconditionally (it is not behind `SHOW_FIELD_POPUPS`) and is the only UI shown in the current button-only mode.
+
+## Build, versioning & CI
+
+- **No runtime dependencies.** `package.json` exists only for dev tooling (ESLint, `web-ext`); nothing there ships in the extension.
+- **Versioning is automated** via release-please, driven by Conventional Commits. A merged release PR bumps `src/manifest.json` `version` (`release-please-config.json` maps `$.version`), tags, publishes a GitHub Release, and attaches a packaged `.zip`. Do not hand-edit the version.
+- **CI lint** (`.github/workflows/lint.yml`) runs ESLint + `web-ext lint` on every push/PR. `browser_specific_settings.gecko` in the manifest exists solely to satisfy `web-ext lint` (Firefox tooling); it is inert in Chrome.
+- **Dependabot** tracks the `github-actions` and `npm` ecosystems.
 
 ## Tooltip
 
