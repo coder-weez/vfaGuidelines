@@ -10,7 +10,8 @@ A Chrome MV3 extension that injects a small **ⓘ icon** next to EMSCharts PCR f
 
 ```
 src/
-  manifest.json    — MV3 manifest; declares the content scripts and toolbar action
+  manifest.json    — MV3 manifest; declares content scripts, service worker, and toolbar action
+  background.js    — Service worker; opens the PDF when the toolbar icon is clicked
   docs.js          — Field definitions: maps EMSCharts field names to doc-standard text
   docassist.js     — Content script; Doc Standards button, icon injection, tooltip
   docassist.css    — Styles for the button, injected icons, and tooltip
@@ -69,6 +70,12 @@ Plain string values are also accepted (treated as `before: false`).
 ## Documentation toolbar button (`docassist.js`)
 
 `createDocToolbar()` appends a fixed-position `<div id="vfa-doc-toolbar">` with a single button labelled "Page N / Doc Standards". Clicking it opens the bundled `VFADocumentationStandards.pdf` at the page mapped in `PAGE_PDF_MAP` (EMSCharts page → PDF page), via `chrome.runtime.getURL(...) + '#page='`. This runs unconditionally (it is not behind `SHOW_FIELD_POPUPS`) and is the only UI shown in the current button-only mode.
+
+`PAGE_PDF_MAP` is duplicated in `background.js` (for the toolbar-icon click handler) and `docassist.js` (for the on-page button). If the mapping changes, update both files.
+
+## Background service worker (`background.js`)
+
+Handles `chrome.action.onClicked` — when the user clicks the extension's toolbar icon, it reads the active tab URL, maps it through `PAGE_PDF_MAP`, and opens the PDF at the matching page via `chrome.tabs.create`. Requires the `activeTab` permission (granted automatically on the click event) to read `tab.url`.
 
 ## Build, versioning & CI
 

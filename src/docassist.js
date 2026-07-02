@@ -155,7 +155,9 @@
 
         var btn = document.createElement('button');
         btn.id = 'vfa-doc-toolbar-btn';
-        btn.innerHTML = 'Page ' + pageNum + '<br>Doc Standards';
+        btn.appendChild(document.createTextNode('Page ' + pageNum));
+        btn.appendChild(document.createElement('br'));
+        btn.appendChild(document.createTextNode('Doc Standards'));
         btn.addEventListener('click', function() {
             var pdfUrl = chrome.runtime.getURL('VFADocumentationStandards.pdf') + '#page=' + getDocPage();
             window.open(pdfUrl, '_blank');
